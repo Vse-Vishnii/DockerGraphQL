@@ -1,0 +1,60 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using BlazorApp3.Data
+@using AntDesign
+@inject DataService DataService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <DataCreation OnAddUser="@OnAddUser"></DataCreation>
+    <Table TItem="Data"
+        DataSource="@data">
+        <Column @bind-Field="@context.Id" Sortable />
+        <Column @bind-Field="@context.Name" Sortable />
+        <Column @bind-Field="@context.Age" Sortable />
+        <ActionColumn>
+            <Space>
+                <SpaceItem><Button Danger OnClick="()=>Delete(context.Id)">Delete</Button></SpaceItem>
+            </Space>
+        </ActionColumn>
+    </Table>
+}
+
+
+
+@code {
+    private IEnumerable<Data> data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        data = await DataService.Get();
+    }
+
+    private async Task OnAddUser(Data data)
+    {
+        await DataService.Add(data);
+        ResetData();
+    }
+
+    private async Task Delete(string id)
+    {
+        await DataService.Delete(id);
+        ResetData();
+    }
+
+    private async Task ResetData()
+    {
+        data = await DataService.Get();
+        StateHasChanged();
+    }
+}

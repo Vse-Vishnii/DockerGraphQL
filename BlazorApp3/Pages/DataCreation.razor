@@ -1,0 +1,67 @@
+﻿@page "/usercreation"
+
+@using Microsoft.AspNetCore.Components
+@using AntDesign
+@using BlazorApp3.Data
+@using Microsoft.AspNetCore.Identity
+
+@inherits FeedbackComponent<BlazorApp3.Data.Data>
+
+
+<Button OnClick="AddData" Type="primary" Style="margin-bottom:16px">
+    Add Data
+</Button>
+<Modal Visible="@visible"
+       OnOk="@HandleOk"
+       OnCancel="@HandleCancel"
+       ConfirmLoading="@loading"
+       OkText="@("Create")"
+       CancelText="@("Cancel")">
+    <Form Model="@data"
+          LabelColSpan="8"
+          WrapperColSpan="8">
+        <FormItem Label="Name">
+            <Input @bind-Value="@context.Name"/>
+        </FormItem>
+        <FormItem Label="Age">
+            <Input @bind-Value="@context.Age"/>
+        </FormItem>
+    </Form>
+</Modal>
+
+<br />
+<br />
+
+
+@code{
+
+    private BlazorApp3.Data.Data data;
+    private bool visible;
+    private bool loading = false;
+
+    [Parameter]
+    public EventCallback<Data> OnAddUser { get; set; }
+
+    private async Task AddData()
+    {
+        data = new BlazorApp3.Data.Data();
+        visible = true;
+    }
+
+    private async Task HandleOk(MouseEventArgs e)
+    {
+        loading = true;
+        StateHasChanged();
+        await OnAddUser.InvokeAsync(data);
+        Console.WriteLine("User Handle");
+        visible = false;
+        loading = false;
+        
+    }
+
+    private void HandleCancel(MouseEventArgs e)
+    {
+        Console.WriteLine("Clicked cancel button");
+        visible = false;
+    }
+}
